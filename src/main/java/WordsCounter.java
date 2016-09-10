@@ -4,54 +4,51 @@ import org.tartarus.snowball.ext.russianStemmer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WordsCounter {
 
     public static void main(String[] args) {
+        Map<String, Integer> wordFreq = getWordFreq("./texts/train1.txt");
+        for (String word : wordFreq.keySet()) {
+            System.out.println(word + " : " + wordFreq.get(word));
+        }
+    }
 
-        String filename = args.length > 0 ? args[0] : "input.txt";
-
+    private static Map<String, Integer> getWordFreq(String path) {
+        Map<String, Integer> counter = new TreeMap<>();
         try {
-            Map<String, Integer> counter = new HashMap<>();
-            Map<String, List<String>> wordsVariants = new HashMap<>();
-
-            Files.lines(Paths.get(filename)).forEach(
-                    (line) -> {
-                        SnowballStemmer stemmer = new russianStemmer();
-                        String[] words = line.
-                                replaceAll("[();:?!,.«»'—\\{\\}\"-]", "").
-                                split(" +");
-                        for (String word : words) {
-                            if (word.equals("")) continue;
-                            word = word.toLowerCase();
-                            String originalWord = "" + word;
-                            stemmer.setCurrent(word);
-                            stemmer.stem();
-                            word = stemmer.getCurrent();
-                            if (!counter.containsKey(word)) {
-                                counter.put(word, 1);
-                                List<String> variants = new LinkedList<>();
-                                variants.add(originalWord);
-                                wordsVariants.put(word, variants);
-                            } else {
-                                counter.put(word, counter.get(word) + 1);
-                                wordsVariants.get(word).add(originalWord);
-                            }
+            Files.lines(Paths.get(path)).forEach(
+                (line) -> {
+                    SnowballStemmer stemmer = new russianStemmer();
+                    String[] words = line.replaceAll("[();:?!,.«»'—\\{\\}\"-]", "").split(" +");
+                    for (String word : words) {
+                        if (word.equals("")) continue;
+                        word = word.toLowerCase();
+                        stemmer.setCurrent(word);
+                        stemmer.stem();
+                        word = stemmer.getCurrent();
+                        if (!counter.containsKey(word)) {
+                            counter.put(word, 1);
+                        } else {
+                            counter.put(word, counter.get(word) + 1);
                         }
                     }
+                }
             );
-
-            for (String word : counter.keySet()) {
-                System.out.println("(" + word + "): "
-                        + wordsVariants.get(word) + " : " + counter.get(word));
-            }
         } catch (IOException e) {
-            System.out.println("File not found: " + filename);
+            System.out.println("File not found: " + path);
         }
+        return counter;
+    }
+
+    private static Set<String> getCommonKeys(List<Set<String>> list) {
+        if (list == null) return null;
+        Set<String> result = new HashSet<>(list.get(0));
+        for (int i = 1; i < list.size(); i++) {
+            result.retainAll(list.get(i));
+        }
+        return result;
     }
 
 }
