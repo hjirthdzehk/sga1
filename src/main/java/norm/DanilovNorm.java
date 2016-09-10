@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class DanilovNorm {
     public double calculateNorm(List<Map<String, Integer>> mapList) {
-        // assume that every map in mapList has the same keys
+        // Assumes that every map in mapList has the same set of keys
         int N = mapList.size();
         int M = mapList.get(0).keySet().size();
         List<String> commonKeys = new ArrayList<>(mapList.get(0).keySet());
@@ -20,5 +20,15 @@ public class DanilovNorm {
             }
         }
         return 2 * Math.sqrt(g) / (N * (N - 1) * M);
+    }
+
+    public double calculateDevianceNorm(Map<String, Float> meanFreq, Map<String, Integer> newSample) {
+        int M = meanFreq.size();
+        double g = 0;
+        List<String> commonKeys = new ArrayList<>(meanFreq.keySet());
+        for (int i = 0; i < M; i++) {
+            g += Math.pow(meanFreq.get(commonKeys.get(i)) - newSample.get(commonKeys.get(i)), 2);
+        }
+        return Math.sqrt(g)/M;
     }
 }
