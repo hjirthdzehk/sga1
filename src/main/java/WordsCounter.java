@@ -5,14 +5,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WordsCounter {
 
     public static void main(String[] args) {
-        Map<String, Integer> wordFreq = getWordFreq("./texts/train1.txt");
-        for (String word : wordFreq.keySet()) {
-            System.out.println(word + " : " + wordFreq.get(word));
+        List<Map<String, Integer>> wordFreqList = new ArrayList<>(10);
+        for (int i = 1; i <= 10; i++) {
+            wordFreqList.add(getWordFreq("./texts/train" + i + ".txt"));
         }
+        Set<String> commonKeys = getCommonKeysFromMapList(wordFreqList);
+        List<Map<String, Integer>> wordFreqListOnlyCommon = keepOnlyCommonKeys(wordFreqList, commonKeys);
     }
 
     private static Map<String, Integer> getWordFreq(String path) {
@@ -49,6 +52,24 @@ public class WordsCounter {
             result.retainAll(list.get(i));
         }
         return result;
+    }
+
+    private static Set<String> getCommonKeysFromMapList(List<Map<String, Integer>> list) {
+        List<Set<String>> wordsList = new ArrayList<>();
+        for (Map<String, Integer> map : list) {
+            wordsList.add(map.keySet());
+        }
+        return getCommonKeys(wordsList);
+    }
+
+    private static List<Map<String, Integer>> keepOnlyCommonKeys(List<Map<String, Integer>> list, Set<String> keys) {
+        for (Map map : list) {
+            Set<String> toRemove = (Set<String>) map.keySet().stream()
+                    .filter(item -> !keys.contains(item))
+                    .collect(Collectors.toSet());
+            map.keySet().removeAll(toRemove);
+        }
+        return list;
     }
 
 }
