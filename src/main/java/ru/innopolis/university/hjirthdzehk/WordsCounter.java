@@ -1,3 +1,5 @@
+package ru.innopolis.university.hjirthdzehk;
+
 import norm.DanilovNorm;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.russianStemmer;
@@ -50,26 +52,21 @@ public class WordsCounter {
     private static Set<String> getCommonKeys(List<Set<String>> list) {
         if (list == null) return null;
         Set<String> result = new HashSet<>(list.get(0));
-        for (int i = 1; i < list.size(); i++) {
-            result.retainAll(list.get(i));
-        }
+        list.forEach(result::retainAll);
         return result;
     }
 
     private static Set<String> getCommonKeysFromMapList(List<Map<String, Integer>> list) {
-        List<Set<String>> wordsList = new ArrayList<>();
-        for (Map<String, Integer> map : list) {
-            wordsList.add(map.keySet());
-        }
+        List<Set<String>> wordsList = list.stream().
+                map(Map::keySet).
+                collect(Collectors.toList());
         return getCommonKeys(wordsList);
     }
 
-    private static List<Map<String, Integer>> keepOnlyCommonKeys(List<Map<String, Integer>> list, Set<String> keys) {
-        for (Map map : list) {
-            Set<String> toRemove = (Set<String>) map.keySet().stream()
-                    .filter(item -> !keys.contains(item))
-                    .collect(Collectors.toSet());
-            map.keySet().removeAll(toRemove);
+    private static List<Map<String, Integer>> keepOnlyCommonKeys(
+            List<Map<String, Integer>> list, Set<String> commonKeys) {
+        for (Map<String, Integer> map : list) {
+            map.keySet().retainAll(commonKeys);
         }
         return list;
     }
