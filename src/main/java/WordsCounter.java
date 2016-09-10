@@ -1,3 +1,4 @@
+import norm.DanilovNorm;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.russianStemmer;
 
@@ -16,6 +17,7 @@ public class WordsCounter {
         }
         Set<String> commonKeys = getCommonKeysFromMapList(wordFreqList);
         List<Map<String, Integer>> wordFreqListOnlyCommon = keepOnlyCommonKeys(wordFreqList, commonKeys);
+        System.out.println("Danilov norm: " + new DanilovNorm().calculateNorm(wordFreqListOnlyCommon));
     }
 
     private static Map<String, Integer> getWordFreq(String path) {
