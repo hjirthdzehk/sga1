@@ -22,7 +22,6 @@ public class WordsCounter {
 
 
     private static void testDanilovNorm() {
-        DanilovNorm norm = new DanilovNorm();
         List<Map<String, Integer>> wordFreqList = new ArrayList<>(10);
         for (int i = 1; i <= 10; i++) {
             wordFreqList.add(getWordFreq("./texts/train" + i + ".txt"));
@@ -30,19 +29,19 @@ public class WordsCounter {
 
         Set<String> allKeys = getAllKeysFromMapList(wordFreqList);
         List<Map<String, Integer>> wordFreqListAllKeys = complementToAllKeys(wordFreqList, allKeys);
-        System.out.println("Danilov norm: " + norm.calculateNorm(wordFreqListAllKeys));
-        Map<String, Float> meanFreqMap = getMeanFreqMap(wordFreqListAllKeys);
+        System.out.println("Danilov norm: " + DanilovNorm.calculateNorm(wordFreqListAllKeys));
+        Map<String, Double> meanFreqMap = getMeanFreqMap(wordFreqListAllKeys);
 
         List<Double> deviances = new ArrayList<>();
         for (int i = 1; i <= 11; i++) {
             List<Map<String, Integer>> testSample = new ArrayList<>();
             if (i == 11) {
-                testSample.add(getWordFreq("./texts/test2.txt"));
+                testSample.add(getWordFreq("./texts/test1.txt"));
             } else {
                 testSample.add(getWordFreq("./texts/train" + i + ".txt"));
             }
             Map<String, Integer> testSampleAllKeys = complementToAllKeys(testSample, allKeys).get(0);
-            double devianceNorm = norm.calculateDevianceNorm(meanFreqMap, testSampleAllKeys);
+            double devianceNorm = DanilovNorm.calculateDevianceNorm(meanFreqMap, testSampleAllKeys);
             String name;
             if (i == 11) {
                 name = "test text\n";
@@ -133,15 +132,15 @@ public class WordsCounter {
         return result;
     }
 
-    private static Map<String, Float> getMeanFreqMap(List<Map<String, Integer>> list) {
+    private static Map<String, Double> getMeanFreqMap(List<Map<String, Integer>> list) {
         int length = list.size();
-        Map<String, Float> result = new TreeMap<>();
+        Map<String, Double> result = new TreeMap<>();
         for (String key : list.get(0).keySet()) {
             int accum = 0;
             for (Map<String, Integer> map : list) {
                 accum += map.get(key);
             }
-            result.put(key, (float)accum/length);
+            result.put(key, (double) (accum / length));
         }
         return result;
     }
