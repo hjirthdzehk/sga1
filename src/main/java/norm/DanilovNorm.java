@@ -26,8 +26,11 @@ public class DanilovNorm {
         int M = meanFreq.size();
         double g = 0;
         List<String> commonKeys = new ArrayList<>(meanFreq.keySet());
+
         for (int i = 0; i < M; i++) {
-            g += Math.pow(meanFreq.get(commonKeys.get(i)) - newSample.get(commonKeys.get(i)), 2);
+            int newSampleValue = 0;
+            if (newSample.containsKey(commonKeys.get(i))) newSampleValue = newSample.get(commonKeys.get(i));
+            g += Math.pow(meanFreq.get(commonKeys.get(i)) - newSampleValue, 2);
         }
         return Math.sqrt(g)/M;
     }
