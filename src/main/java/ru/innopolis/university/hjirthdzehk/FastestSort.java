@@ -1,11 +1,16 @@
 package ru.innopolis.university.hjirthdzehk;
 
+import com.google.caliper.BeforeExperiment;
+import com.google.caliper.Benchmark;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class FastestSort {
+
+    double[] values;
 
     private static int convertTo(double value) {
         return (int) Math.round(value * 1000000 + 500000000);
@@ -31,17 +36,26 @@ public class FastestSort {
     }
 
     public static void main(String[] args) throws IOException {
-
-        double[] values = readValues("./data.txt");
-
+        FastestSort s = new FastestSort();
+        s.setUp();
         System.out.println("Started!");
-        double[] result = countingSort(values, 1000000000);
+        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
     }
 
     private static double[] readValues(String filename) throws IOException {
         return Files.lines(Paths.get(filename)).parallel().
                 mapToDouble(Double::parseDouble).toArray();
+    }
+
+    @BeforeExperiment
+    void setUp() throws IOException {
+        values = readValues("./data.txt");
+    }
+
+    @Benchmark
+    double[] timeSort(int reps) {
+        return countingSort(values, 1000000000);
     }
 
 }
