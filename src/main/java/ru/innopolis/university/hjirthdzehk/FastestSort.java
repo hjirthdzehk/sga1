@@ -40,7 +40,8 @@ public class FastestSort {
         s.setUp();
 //        s.values = new double[] {-1, 2, 3, -4, 5, -6};
         System.out.println("Started!");
-        s.quickSort();
+//        s.quickSort();
+        s.radixSort();
 //        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
     }
@@ -48,6 +49,24 @@ public class FastestSort {
     private static double[] readValues(String filename) throws IOException {
         return Files.lines(Paths.get(filename)).parallel().
                 mapToDouble(Double::parseDouble).toArray();
+    }
+
+    public void radixSort() {
+        for (int shift = Integer.SIZE - 1; shift > -1; shift--) {
+            double[] tmp = new double[values.length];
+            int j = 0;
+            for (int i = 0; i < values.length; i++) {
+                boolean move = convertTo(values[i]) << shift >= 0;
+                if ((shift == 0) != move) {
+                    tmp[j] = values[i];
+                    j++;
+                } else {
+                    values[i - j] = values[i];
+                }
+            }
+            System.arraycopy(values, 0, tmp, j, tmp.length - j);
+            values = tmp;
+        }
     }
 
     public void quickSort() {
