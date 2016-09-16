@@ -13,7 +13,7 @@ public class TimSort {
         }
     }
 
-    public void sort(long[] list){
+    public void sort(double[] list){
         int minrun = getMinrun(list.length);
         Stack<Range> runs = new Stack<>();
         int currentIndex = 0;
@@ -58,13 +58,13 @@ public class TimSort {
         }
     }
 
-    private void mergeRuns(long[] list, Range first, Range second) {
+    private void mergeRuns(double[] list, Range first, Range second) {
         if (first.start > second.start) {
             Range temp = first;
             first = second;
             second = temp;
         }
-        long[] tempList = new long[first.length];
+        double[] tempList = new double[first.length];
         System.arraycopy(list, first.start, tempList, 0, first.length);
         int tempIndex = 0, secondIndex = second.start;
         int secondEndIndex = second.start + second.length;
@@ -84,9 +84,9 @@ public class TimSort {
         }
     }
 
-    private void insertionSort(long[] arr, int from, int to){
+    private void insertionSort(double[] arr, int from, int to){
         int i, j;
-        long newValue;
+        double newValue;
         for (i = from+1; i <= to && i<arr.length; i++) {
             newValue = arr[i];
             j = i;
