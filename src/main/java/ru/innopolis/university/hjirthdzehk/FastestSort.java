@@ -38,14 +38,63 @@ public class FastestSort {
     public static void main(String[] args) throws IOException {
         FastestSort s = new FastestSort();
         s.setUp();
+//        s.values = new double[] {-1, 2, 3, -4, 5, -6};
         System.out.println("Started!");
-        double[] result = countingSort(s.values, 1000000000);
+        s.quickSort();
+//        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
     }
 
     private static double[] readValues(String filename) throws IOException {
         return Files.lines(Paths.get(filename)).parallel().
                 mapToDouble(Double::parseDouble).toArray();
+    }
+
+    public void quickSort() {
+        quickSort(0, values.length);
+    }
+
+    private void quickSort(int from, int to) {
+        if (to - from <= 200) {
+            Arrays.sort(values, from, to);
+            return;
+        }
+
+        double median = median(from, to);
+
+        int left = from;
+        int right = to - 1;
+
+        while (left < right) {
+            while (values[left] <= median) {
+                left++;
+            }
+            while (values[right] > median) {
+                right--;
+            }
+            if (left < right) {
+                swap(left, right);
+            }
+        }
+        quickSort(from, left);
+        quickSort(left, to);
+    }
+
+    private void swap(int from, int to) {
+        double tmp = values[from];
+        values[from] = values[to];
+        values[to] = tmp;
+    }
+
+    private double median(int from, int to) {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = from; i < to; ++i) {
+            double current = values[i];
+            max = current > max ? current : max;
+            min = current < min ? current : min;
+        }
+        return (min + max) / 2;
     }
 
     @BeforeExperiment
