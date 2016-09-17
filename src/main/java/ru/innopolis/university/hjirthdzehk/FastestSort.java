@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 public class FastestSort {
 
+    private static final int BITS_PER_BYTE = 8;
     double[] values;
 
     private static int convertTo(double value) {
@@ -51,22 +52,45 @@ public class FastestSort {
                 mapToDouble(Double::parseDouble).toArray();
     }
 
-    public void radixSort() {
-        for (int shift = Integer.SIZE - 1; shift > -1; shift--) {
-            double[] tmp = new double[values.length];
-            int j = 0;
-            for (int i = 0; i < values.length; i++) {
-                boolean move = convertTo(values[i]) << shift >= 0;
-                if ((shift == 0) != move) {
-                    tmp[j] = values[i];
-                    j++;
-                } else {
-                    values[i - j] = values[i];
-                }
+    public static void radixSort(double[] numbers) {
+        final int R = 1 << BITS_PER_BYTE;    // each bytes is between 0 and 255
+        final int MASK = R - 1;              // 0xFF
+        final int BYTES_COUNT = Integer.SIZE / BITS_PER_BYTE;  // each int is 4 bytes
+
+        final int numbersCount = numbers.length;
+        double[] aux = new double[numbersCount];
+
+        for (int currentByte = 0; currentByte < BYTES_COUNT; currentByte++) {
+            int[] count = new int[R + 1];
+            for (double number : numbers) {
+                int c = (convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK;
+                count[c + 1]++;
             }
-            System.arraycopy(values, 0, tmp, j, tmp.length - j);
-            values = tmp;
+
+            for (int r = 0; r < R; r++) {
+                count[r + 1] += count[r];
+            }
+
+            if (currentByte == BYTES_COUNT - 1) {
+                int shift1 = count[R] - count[R / 2];
+                int shift2 = count[R / 2];
+                for (int r = 0; r < R / 2; r++)
+                    count[r] += shift1;
+                for (int r = R / 2; r < R; r++)
+                    count[r] -= shift2;
+            }
+
+            for (double number : numbers) {
+                int c = (convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK;
+                aux[count[c]++] = number;
+            }
+
+            System.arraycopy(aux, 0, numbers, 0, numbersCount);
         }
+    }
+
+    public void radixSort() {
+        radixSort(values);
     }
 
     public void quickSort() {
