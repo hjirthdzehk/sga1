@@ -43,6 +43,7 @@ public class FastestSort {
         System.out.println("Started!");
 //        s.quickSort();
         s.radixSort();
+//        Arrays.sort(s.values);
 //        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
     }
@@ -60,28 +61,28 @@ public class FastestSort {
         final int numbersCount = numbers.length;
         double[] aux = new double[numbersCount];
 
-        for (int currentByte = 0; currentByte < BYTES_COUNT; currentByte++) {
+        for (byte currentByte = 0; currentByte < BYTES_COUNT; currentByte++) {
             int[] count = new int[R + 1];
             for (double number : numbers) {
-                int c = (convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK;
+                short c = (short) ((convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK);
                 count[c + 1]++;
             }
 
-            for (int r = 0; r < R; r++) {
+            for (short r = 0; r < R; r++) {
                 count[r + 1] += count[r];
             }
 
             if (currentByte == BYTES_COUNT - 1) {
                 int shift1 = count[R] - count[R / 2];
                 int shift2 = count[R / 2];
-                for (int r = 0; r < R / 2; r++)
+                for (short r = 0; r < R / 2; r++) {
                     count[r] += shift1;
-                for (int r = R / 2; r < R; r++)
-                    count[r] -= shift2;
+                    count[R / 2 + r] -= shift2;
+                }
             }
 
             for (double number : numbers) {
-                int c = (convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK;
+                short c = (short) ((convertTo(number) >> BITS_PER_BYTE * currentByte) & MASK);
                 aux[count[c]++] = number;
             }
 
@@ -147,7 +148,10 @@ public class FastestSort {
 
     @Benchmark
     double[] timeSort(int reps) {
+        Arrays.sort(values);
+        radixSort();
         return countingSort(values, 1000000000);
+//        return values;
     }
 
 }
