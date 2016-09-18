@@ -12,6 +12,7 @@ public class FastestSort {
 
     private static final int BITS_PER_BYTE = 8;
     double[] values;
+    double[] copy;
 
     private static int convertTo(double value) {
         return (int) Math.round(value * 1000000 + 500000000);
@@ -39,10 +40,9 @@ public class FastestSort {
     public static void main(String[] args) throws IOException {
         FastestSort s = new FastestSort();
         s.setUp();
-//        s.values = new double[] {-1, 2, 3, -4, 5, -6};
         System.out.println("Started!");
 //        s.quickSort();
-        s.radixSort();
+//        s.radixSort(s.values);
 //        Arrays.sort(s.values);
 //        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
@@ -53,7 +53,7 @@ public class FastestSort {
                 mapToDouble(Double::parseDouble).toArray();
     }
 
-    public static void radixSort(double[] numbers) {
+    public static double[] radixSort(double[] numbers) {
         final int R = 1 << BITS_PER_BYTE;    // each bytes is between 0 and 255
         final int MASK = R - 1;              // 0xFF
         final int BYTES_COUNT = Integer.SIZE / BITS_PER_BYTE;  // each int is 4 bytes
@@ -73,11 +73,11 @@ public class FastestSort {
             }
 
             if (currentByte == BYTES_COUNT - 1) {
-                int shift1 = count[R] - count[R / 2];
-                int shift2 = count[R / 2];
-                for (short r = 0; r < R / 2; r++) {
+                int shift1 = count[R] - count[R >> 1];
+                int shift2 = count[R >> 1];
+                for (short r = 0; r < (R >> 1); r++) {
                     count[r] += shift1;
-                    count[R / 2 + r] -= shift2;
+                    count[(R >> 1) + r] -= shift2;
                 }
             }
 
@@ -88,53 +88,51 @@ public class FastestSort {
 
             System.arraycopy(aux, 0, numbers, 0, numbersCount);
         }
+        return numbers;
     }
 
-    public void radixSort() {
-        radixSort(values);
+    public static double[] quickSort(double[] numbers) {
+        quickSort(numbers, 0, numbers.length);
+        return numbers;
     }
 
-    public void quickSort() {
-        quickSort(0, values.length);
-    }
-
-    private void quickSort(int from, int to) {
-        if (to - from <= 200) {
-            Arrays.sort(values, from, to);
+    private static void quickSort(double[] numbers, int from, int to) {
+        if (to - from <= 46) { // 47 is an insertion sort threshold in standard library
+            Arrays.sort(numbers, from, to);
             return;
         }
 
-        double median = median(from, to);
+        double median = median(numbers, from, to);
 
         int left = from;
         int right = to - 1;
 
         while (left < right) {
-            while (values[left] <= median) {
+            while (numbers[left] <= median) {
                 left++;
             }
-            while (values[right] > median) {
+            while (numbers[right] > median) {
                 right--;
             }
             if (left < right) {
-                swap(left, right);
+                swap(numbers, left, right);
             }
         }
-        quickSort(from, left);
-        quickSort(left, to);
+        quickSort(numbers, from, left);
+        quickSort(numbers, left, to);
     }
 
-    private void swap(int from, int to) {
-        double tmp = values[from];
-        values[from] = values[to];
-        values[to] = tmp;
+    private static void swap(double[] numbers, int from, int to) {
+        double tmp = numbers[from];
+        numbers[from] = numbers[to];
+        numbers[to] = tmp;
     }
 
-    private double median(int from, int to) {
+    private static double median(double[] numbers, int from, int to) {
         double max = Double.NEGATIVE_INFINITY;
         double min = Double.POSITIVE_INFINITY;
         for (int i = from; i < to; ++i) {
-            double current = values[i];
+            double current = numbers[i];
             max = current > max ? current : max;
             min = current < min ? current : min;
         }
@@ -142,16 +140,45 @@ public class FastestSort {
     }
 
     @BeforeExperiment
-    void setUp() throws IOException {
+    private void setUp() throws IOException {
         values = readValues("./data.txt");
+        copy = new double[values.length];
     }
 
     @Benchmark
-    double[] timeSort(int reps) {
-        Arrays.sort(values);
-        radixSort();
-        return countingSort(values, 1000000000);
-//        return values;
+    double[] timeStandartSort(int reps) {
+        for (int i = 0; i < reps; ++i) {
+            System.arraycopy(values, 0, copy, 0, values.length);
+            Arrays.sort(copy);
+        }
+        return copy;
+    }
+
+    @Benchmark
+    double[] timeQuickSort(int reps) {
+        for (int i = 0; i < reps; ++i) {
+            System.arraycopy(values, 0, copy, 0, values.length);
+            quickSort(copy);
+        }
+        return copy;
+    }
+
+    @Benchmark
+    double[] timeCountingSort(int reps) {
+        for (int i = 0; i < reps; ++i) {
+            System.arraycopy(values, 0, copy, 0, values.length);
+            countingSort(copy, 1000000000);
+        }
+        return copy;
+    }
+
+    @Benchmark
+    double[] timeRadixSort(int reps) {
+        for (int i = 0; i < reps; ++i) {
+            System.arraycopy(values, 0, copy, 0, values.length);
+            radixSort(copy);
+        }
+        return copy;
     }
 
 }
