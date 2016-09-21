@@ -19,7 +19,7 @@ public class DanilovNorm {
                 }
             }
         }
-        return 2 * Math.sqrt(g) / (N * (N - 1) * M);
+        return  Math.sqrt(2 * g / (N * (N - 1) * M));
     }
 
     public static double calculateDevianceNorm(Map<String, Double> meanFreq, Map<String, Integer> newSample) {
@@ -31,6 +31,6 @@ public class DanilovNorm {
                     return Math.pow(meanFreq.get(word) - newSampleValue, 2);
                 }).
                 reduce(Double::sum).get();
-        return Math.sqrt(g)/M;
+        return Math.sqrt(g/M);
     }
 }
