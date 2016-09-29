@@ -39,11 +39,50 @@ public class FastestSort {
         return input;
     }
 
+    public static int checkOrder(double[] input){
+        if (input.length == 0 || input.length == 1) {
+            return 0;
+        }
+        int i;
+        for (i = 1; i < input.length; i++) {
+            if (input[i] < input[i-1]){
+                break;
+            }
+        }
+        if (i == input.length){
+            return 1;
+        }
+        for (i = 1; i < input.length; i++) {
+            if (input[i] > input[i-1]){
+                break;
+            }
+        }
+        if (i == input.length){
+            return -1;
+        }
+        return 0;
+    }
+
     public static void main(String[] args) throws IOException {
-        FastestSort s = new FastestSort();
-        s.setUp();
-        System.out.println("Started!");
-        System.out.println("Done!");
+
+        System.out.println(checkOrder(new double[]{1,2,2,2,3,4,5})); // 1
+        System.out.println(checkOrder(new double[]{6,5,4,3,3,2,1})); // -1
+        System.out.println(checkOrder(new double[]{1,2,5,4,5})); // 0
+        //FastestSort s = new FastestSort();
+//        s.setUp();
+//        System.out.println("Started!");
+
+
+//
+//        FastestSort s = new FastestSort();
+//        s.setUp();
+//        System.out.println("Started!");
+//        s.quickSort();
+//        s.radixSort(s.values);
+//        Arrays.sort(s.values);
+//        double[] result = countingSort(s.values, 1000000000);
+
+//        System.out.println("Done!");
     }
 
     private static double[] readValues(String filename) throws IOException {
