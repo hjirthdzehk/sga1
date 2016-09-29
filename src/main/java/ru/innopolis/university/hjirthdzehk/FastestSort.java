@@ -95,8 +95,9 @@ public class FastestSort {
     }
 
     private static double[] readValues(String filename) throws IOException {
-        return Files.lines(Paths.get(filename)).parallel().
-                mapToDouble(Double::parseDouble).toArray();
+        return Files.lines(Paths.get(filename)).parallel()
+                .filter(line -> !line.equals(""))
+                .mapToDouble(Double::parseDouble).toArray();
     }
 
     public static double[] radixSort(double[] numbers) {
