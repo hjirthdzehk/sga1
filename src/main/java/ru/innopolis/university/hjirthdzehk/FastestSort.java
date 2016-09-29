@@ -11,7 +11,9 @@ import java.util.Arrays;
 public class FastestSort {
 
     private static final int BITS_PER_BYTE = 8;
-    double[] values;
+    double[] values_random;
+    double[] values_sortedAsc;
+    double[] values_sortedDesc;
     double[] copy;
 
     private static int convertTo(double value) {
@@ -41,10 +43,6 @@ public class FastestSort {
         FastestSort s = new FastestSort();
         s.setUp();
         System.out.println("Started!");
-//        s.quickSort();
-//        s.radixSort(s.values);
-//        Arrays.sort(s.values);
-//        double[] result = countingSort(s.values, 1000000000);
         System.out.println("Done!");
     }
 
@@ -139,43 +137,42 @@ public class FastestSort {
         return (min + max) / 2;
     }
 
+    private void reverseByExchanges(double[] input) {
+        for (int i = 0; i < input.length >> 1; ++i) {
+            swap(input, i, (input.length - 1) - i);
+        }
+    }
+
     @BeforeExperiment
     private void setUp() throws IOException {
-        values = readValues("./data.txt");
-        copy = new double[values.length];
+        values_random = readValues("./data.txt");
+        values_sortedAsc = readValues("./sorted_data.txt");
+        values_sortedDesc = readValues("./desc_sorted_data.txt");
+        copy = new double[values_random.length];
     }
 
     @Benchmark
-    double[] timeStandartSort(int reps) {
+    double[] timeRandomRadixSort(int reps) {
         for (int i = 0; i < reps; ++i) {
-            System.arraycopy(values, 0, copy, 0, values.length);
-            Arrays.sort(copy);
+            System.arraycopy(values_random, 0, copy, 0, values_random.length);
+            radixSort(copy);
         }
         return copy;
     }
 
     @Benchmark
-    double[] timeQuickSort(int reps) {
+    double[] timeAscSortedRadixSort(int reps) {
         for (int i = 0; i < reps; ++i) {
-            System.arraycopy(values, 0, copy, 0, values.length);
-            quickSort(copy);
+            System.arraycopy(values_sortedAsc, 0, copy, 0, values_sortedAsc.length);
+            radixSort(copy);
         }
         return copy;
     }
 
     @Benchmark
-    double[] timeCountingSort(int reps) {
+    double[] timeDescSortedRadixSort(int reps) {
         for (int i = 0; i < reps; ++i) {
-            System.arraycopy(values, 0, copy, 0, values.length);
-            countingSort(copy, 1000000000);
-        }
-        return copy;
-    }
-
-    @Benchmark
-    double[] timeRadixSort(int reps) {
-        for (int i = 0; i < reps; ++i) {
-            System.arraycopy(values, 0, copy, 0, values.length);
+            System.arraycopy(values_sortedDesc, 0, copy, 0, values_sortedDesc.length);
             radixSort(copy);
         }
         return copy;
