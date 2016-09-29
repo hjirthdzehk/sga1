@@ -39,6 +39,15 @@ public class FastestSort {
         return input;
     }
 
+    public static void reverseArray(double[] input){
+        for(int i = 0; i < input.length / 2; i++)
+        {
+            double temp = input[i];
+            input[i] = input[input.length - i - 1];
+            input[input.length - i - 1] = temp;
+        }
+    }
+
     public static int checkOrder(double[] input){
         if (input.length == 0 || input.length == 1) {
             return 0;
