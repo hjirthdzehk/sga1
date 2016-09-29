@@ -100,6 +100,15 @@ public class FastestSort {
     }
 
     public static double[] radixSort(double[] numbers) {
+        int orderType = checkOrder(numbers);
+        if (orderType == 1)
+            return numbers;
+
+        if (orderType == -1){
+            reverseArray(numbers);
+            return numbers;
+        }
+
         final int R = 1 << BITS_PER_BYTE;    // each bytes is between 0 and 255
         final int MASK = R - 1;              // 0xFF
         final int BYTES_COUNT = Integer.SIZE / BITS_PER_BYTE;  // each int is 4 bytes
